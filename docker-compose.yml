@@ -1,0 +1,34 @@
+version: '3'
+services:
+  api:
+    #инструкция, когда контейнер выключается из-за ошибки, перезапускает его сам. Можно расставить везде. Try-catch в докере
+    restart: always
+    build: ./api
+    ports:
+      #сначала порт, который будет открыт на компе, а потом порт, который будет работать внутри докера
+      - 5555:5000
+    #инструкция, чтобы при запуске mysql запускалась api
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 3000:3000
+  mysql:
+    #так как у нас нет mysql, указываем инструкцию image: образ для скачивания из DockerHub
+    image: mysql
+    #не нужен порт, так как с mysql будем взаимодействовать через adminer
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=time_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+  adminer:
+    image: adminer
+    ports:
+      - 8888:8080
+
+volumes:
+#глобальная папка, к которой мы присваиваем папки
+  mysql_data: 
